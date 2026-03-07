@@ -1,0 +1,198 @@
+<div class="page-container">
+  @if (finished()) {
+    <!-- Results screen -->
+    <mat-card class="results-card">
+      <mat-card-content>
+        <div class="results-content">
+          <mat-icon class="results-icon" [class.great]="scorePercent >= 80" [class.ok]="scorePercent >= 50 && scorePercent < 80" [class.poor]="scorePercent < 50">
+            {{ scorePercent >= 80 ? 'emoji_events' : scorePercent >= 50 ? 'thumb_up' : 'school' }}
+          </mat-icon>
+          <h2 class="results-title">Training abgeschlossen!</h2>
+          <div class="score-display">
+            <span class="score-number">{{ scorePercent }}%</span>
+          </div>
+          <div class="score-details">
+            <span class="correct-count"><mat-icon>check_circle</mat-icon> {{ correct() }} richtig</span>
+            <span class="wrong-count"><mat-icon>cancel</mat-icon> {{ wrong() }} falsch</span>
+          </div>
+          <div class="results-actions">
+            <button mat-stroked-button (click)="restart()">
+              <mat-icon>replay</mat-icon>
+              Nochmal
+            </button>
+            <a mat-flat-button color="primary" routerLink="/training">
+              <mat-icon>tune</mat-icon>
+              Neues Training
+            </a>
+            <a mat-button routerLink="/">
+              <mat-icon>home</mat-icon>
+              Übersicht
+            </a>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+  } @else if (current()) {
+    <!-- Progress bar -->
+    <div class="progress-row">
+      <span class="progress-label">{{ currentIndex() + 1 }} / {{ vocabulary().length }}</span>
+      <mat-progress-bar mode="determinate" [value]="progress()" class="progress-bar"></mat-progress-bar>
+      <span class="score-inline">
+        <mat-icon class="score-icon correct-icon">check</mat-icon>{{ correct() }}
+        <mat-icon class="score-icon wrong-icon">close</mat-icon>{{ wrong() }}
+      </span>
+    </div>
+
+    <!-- Flashcard mode -->
+    @if (mode() === 'flashcard') {
+      <div class="card-wrapper" (click)="flip()">
+        <mat-card class="flash-card" [class.flipped]="flipped()">
+          <mat-card-content class="flash-content">
+            @if (!flipped()) {
+              <div class="card-side">
+                <div class="card-label">Deutsch</div>
+                <div class="card-word">{{ current().german }}</div>
+                <div class="tap-hint">Tippen zum Aufdecken</div>
+              </div>
+            } @else {
+              <div class="card-side revealed">
+                <div class="card-label">Zürichdeutsch</div>
+                <div class="card-word">{{ current().swissGerman }}</div>
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      @if (flipped()) {
+        <div class="flashcard-actions">
+          <button mat-flat-button class="wrong-btn" (click)="markWrong()">
+            <mat-icon>close</mat-icon>
+            Falsch
+          </button>
+          <button mat-flat-button class="correct-btn" (click)="markCorrect()">
+            <mat-icon>check</mat-icon>
+            Richtig
+          </button>
+        </div>
+      }
+    }
+
+    <!-- Type-in mode -->
+    @if (mode() === 'type-in') {
+      <mat-card class="question-card">
+        <mat-card-content>
+          <div class="card-label">Deutsch</div>
+          <div class="card-word">{{ current().german }}</div>
+          <mat-divider class="divider"></mat-divider>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Zürichdeutsch</mat-label>
+            <input
+              matInput
+              [(ngModel)]="userInput"
+              [disabled]="submitted()"
+              (keyup.enter)="!submitted() && submitTypeIn()"
+              placeholder="Deine Antwort..."
+              autocomplete="off"
+            />
+          </mat-form-field>
+
+          @if (submitted()) {
+            <div class="answer-feedback" [class.correct]="isCorrectAnswer()" [class.wrong]="!isCorrectAnswer()">
+              @if (isCorrectAnswer()) {
+                <mat-icon>check_circle</mat-icon>
+                Richtig!
+              } @else {
+                <mat-icon>cancel</mat-icon>
+                Falsch! Richtige Antwort: <strong>{{ current().swissGerman }}</strong>
+              }
+            </div>
+          }
+        </mat-card-content>
+        <mat-card-actions align="end">
+          @if (!submitted()) {
+            <button mat-flat-button color="primary" (click)="submitTypeIn()" [disabled]="!userInput().trim()">
+              Prüfen
+            </button>
+          } @else {
+            <button mat-flat-button color="primary" (click)="next()">
+              Weiter <mat-icon>arrow_forward</mat-icon>
+            </button>
+          }
+        </mat-card-actions>
+      </mat-card>
+    }
+
+    <!-- Multiple choice mode -->
+    @if (mode() === 'multiple-choice') {
+      <mat-card class="question-card">
+        <mat-card-content>
+          <div class="card-label">Deutsch</div>
+          <div class="card-word">{{ current().german }}</div>
+          <mat-divider class="divider"></mat-divider>
+          <div class="options-grid">
+            @for (opt of options(); track opt) {
+              <button
+                mat-stroked-button
+                class="option-btn"
+                [class]="optionClass(opt)"
+                (click)="selectOption(opt)"
+                [disabled]="selectedOption() !== null"
+              >
+                {{ opt }}
+              </button>
+            }
+          </div>
+        </mat-card-content>
+        @if (selectedOption() !== null) {
+          <mat-card-actions align="end">
+            <button mat-flat-button color="primary" (click)="next()">
+              Weiter <mat-icon>arrow_forward</mat-icon>
+            </button>
+          </mat-card-actions>
+        }
+      </mat-card>
+    }
+
+    <!-- Example sentence section -->
+    <div class="example-section">
+      @if (!exampleSentence() && !loadingExample()) {
+        <button
+          mat-stroked-button
+          (click)="loadExampleSentence()"
+          [disabled]="!claudeService.hasApiKey()"
+          [matTooltip]="claudeService.hasApiKey() ? '' : 'API-Key in Einstellungen hinterlegen'"
+        >
+          <mat-icon>format_quote</mat-icon>
+          Beispielsatz anzeigen
+        </button>
+      }
+
+      @if (loadingExample()) {
+        <div class="loading-row">
+          <mat-spinner diameter="20"></mat-spinner>
+          <span>Beispielsatz wird generiert...</span>
+        </div>
+      }
+
+      @if (exampleSentence()) {
+        <mat-card class="example-card">
+          <mat-card-content>
+            <div class="example-swiss">
+              <mat-icon class="quote-icon">format_quote</mat-icon>
+              {{ exampleSentence()!.swiss }}
+            </div>
+            @if (exampleSentence()!.german) {
+              <div class="example-german">{{ exampleSentence()!.german }}</div>
+            }
+          </mat-card-content>
+        </mat-card>
+      }
+
+      @if (exampleError()) {
+        <p class="error-text">{{ exampleError() }}</p>
+      }
+    </div>
+  }
+</div>

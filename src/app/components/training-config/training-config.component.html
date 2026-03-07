@@ -1,0 +1,38 @@
+<div class="page-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Training starten</mat-card-title>
+      <mat-card-subtitle>Wähle einen Trainingsmodus</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-radio-group [(ngModel)]="selectedMode" class="mode-group">
+        @for (mode of modes; track mode.value) {
+          <mat-card
+            class="mode-card"
+            [class.selected]="selectedMode() === mode.value"
+            (click)="selectedMode.set(mode.value)"
+          >
+            <mat-card-content class="mode-card-content">
+              <mat-radio-button [value]="mode.value" class="mode-radio">
+                <div class="mode-info">
+                  <mat-icon class="mode-icon">{{ mode.icon }}</mat-icon>
+                  <div>
+                    <div class="mode-label">{{ mode.label }}</div>
+                    <div class="mode-description">{{ mode.description }}</div>
+                  </div>
+                </div>
+              </mat-radio-button>
+            </mat-card-content>
+          </mat-card>
+        }
+      </mat-radio-group>
+    </mat-card-content>
+    <mat-card-actions align="end">
+      <a mat-button routerLink="/">Abbrechen</a>
+      <button mat-flat-button color="primary" (click)="start()">
+        <mat-icon>play_arrow</mat-icon>
+        Training starten
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

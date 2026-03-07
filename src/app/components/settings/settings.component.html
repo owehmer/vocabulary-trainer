@@ -1,0 +1,41 @@
+<div class="page-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Einstellungen</mat-card-title>
+      <mat-card-subtitle>Claude API-Key für die KI-Funktionen</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p class="info-text">
+        <mat-icon class="info-icon">info</mat-icon>
+        Dein API-Key wird nur lokal in deinem Browser gespeichert und niemals an Dritte übermittelt.
+        Du kannst ihn unter <strong>console.anthropic.com</strong> erstellen.
+      </p>
+
+      @if (!claudeService.hasApiKey()) {
+        <div class="warning-box">
+          <mat-icon>warning</mat-icon>
+          Kein API-Key hinterlegt — die KI-Funktionen (Auto-Vervollständigung, Beispielsätze) sind deaktiviert.
+        </div>
+      }
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Claude API-Key</mat-label>
+        <input
+          matInput
+          [type]="hideKey() ? 'password' : 'text'"
+          [(ngModel)]="apiKey"
+          placeholder="sk-ant-api03-..."
+        />
+        <button mat-icon-button matSuffix (click)="toggleVisibility()" type="button">
+          <mat-icon>{{ hideKey() ? 'visibility' : 'visibility_off' }}</mat-icon>
+        </button>
+      </mat-form-field>
+    </mat-card-content>
+    <mat-card-actions align="end">
+      <button mat-flat-button color="primary" (click)="save()">
+        <mat-icon>save</mat-icon>
+        Speichern
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

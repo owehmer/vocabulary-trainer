@@ -1,0 +1,56 @@
+.page-container {
+  max-width: 600px;
+  margin: 24px auto;
+  padding: 0 16px;
+}
+
+.mode-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.mode-card {
+  cursor: pointer;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  border: 2px solid transparent;
+}
+
+.mode-card.selected {
+  border-color: #1976d2;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
+}
+
+.mode-card-content {
+  padding: 8px 16px !important;
+}
+
+.mode-radio {
+  width: 100%;
+}
+
+.mode-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 4px 0;
+}
+
+.mode-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: #1976d2;
+}
+
+.mode-label {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.mode-description {
+  font-size: 13px;
+  color: #666;
+  margin-top: 2px;
+}
