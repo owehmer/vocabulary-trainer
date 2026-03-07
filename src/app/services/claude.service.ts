@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../environments/environment';
 
 const API_KEY_STORAGE = 'vokabel_api_key';
 const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
@@ -12,7 +13,7 @@ export interface ExampleSentence {
 @Injectable({ providedIn: 'root' })
 export class ClaudeService {
   getApiKey(): string {
-    return localStorage.getItem(API_KEY_STORAGE) ?? '';
+    return environment.claudeApiKey || localStorage.getItem(API_KEY_STORAGE) || '';
   }
 
   saveApiKey(key: string): void {
