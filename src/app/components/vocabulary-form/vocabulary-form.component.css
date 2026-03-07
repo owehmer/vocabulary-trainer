@@ -28,6 +28,11 @@
   gap: 6px;
 }
 
+.speak-btn {
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
 .hint-text {
   display: flex;
   align-items: center;

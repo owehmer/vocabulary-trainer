@@ -30,6 +30,19 @@
           }
           Generieren
         </button>
+
+        @if (speechService.supported) {
+          <button
+            mat-icon-button
+            type="button"
+            class="speak-btn"
+            (click)="speechService.speak(swissGerman())"
+            [disabled]="!swissGerman().trim()"
+            matTooltip="Aussprechen"
+          >
+            <mat-icon>{{ speechService.speaking() ? 'stop' : 'volume_up' }}</mat-icon>
+          </button>
+        }
       </div>
 
       @if (!claudeService.hasApiKey()) {

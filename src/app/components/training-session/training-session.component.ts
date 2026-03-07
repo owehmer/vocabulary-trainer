@@ -12,6 +12,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { VocabularyService } from '../../services/vocabulary.service';
 import { ClaudeService, ExampleSentence } from '../../services/claude.service';
+import { SpeechService } from '../../services/speech.service';
 import { Vocabulary } from '../../models/vocabulary.model';
 import { TrainingMode } from '../training-config/training-config.component';
 
@@ -38,6 +39,7 @@ export class TrainingSessionComponent implements OnInit {
   private router = inject(Router);
   private vocabService = inject(VocabularyService);
   claudeService = inject(ClaudeService);
+  speechService = inject(SpeechService);
 
   mode = signal<TrainingMode>('flashcard');
   vocabulary = signal<Vocabulary[]>([]);

@@ -59,6 +59,11 @@
               <div class="card-side revealed">
                 <div class="card-label">Zürichdeutsch</div>
                 <div class="card-word">{{ current().swissGerman }}</div>
+                @if (speechService.supported) {
+                  <button mat-icon-button class="speak-inline" (click)="$event.stopPropagation(); speechService.speak(current().swissGerman)" matTooltip="Aussprechen">
+                    <mat-icon>{{ speechService.speaking() ? 'stop' : 'volume_up' }}</mat-icon>
+                  </button>
+                }
               </div>
             }
           </mat-card-content>
@@ -106,6 +111,11 @@
               } @else {
                 <mat-icon>cancel</mat-icon>
                 Falsch! Richtige Antwort: <strong>{{ current().swissGerman }}</strong>
+              }
+              @if (speechService.supported) {
+                <button mat-icon-button class="speak-inline" (click)="speechService.speak(current().swissGerman)" matTooltip="Aussprechen">
+                  <mat-icon>{{ speechService.speaking() ? 'stop' : 'volume_up' }}</mat-icon>
+                </button>
               }
             </div>
           }
@@ -182,6 +192,11 @@
             <div class="example-swiss">
               <mat-icon class="quote-icon">format_quote</mat-icon>
               {{ exampleSentence()!.swiss }}
+              @if (speechService.supported) {
+                <button mat-icon-button class="speak-inline" (click)="speechService.speak(exampleSentence()!.swiss)" matTooltip="Aussprechen">
+                  <mat-icon>{{ speechService.speaking() ? 'stop' : 'volume_up' }}</mat-icon>
+                </button>
+              }
             </div>
             @if (exampleSentence()!.german) {
               <div class="example-german">{{ exampleSentence()!.german }}</div>

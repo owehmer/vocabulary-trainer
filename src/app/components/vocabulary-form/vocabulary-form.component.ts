@@ -11,6 +11,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { VocabularyService } from '../../services/vocabulary.service';
 import { ClaudeService } from '../../services/claude.service';
+import { SpeechService } from '../../services/speech.service';
 
 @Component({
   selector: 'app-vocabulary-form',
@@ -34,6 +35,7 @@ export class VocabularyFormComponent implements OnInit {
   private router = inject(Router);
   private vocabService = inject(VocabularyService);
   claudeService = inject(ClaudeService);
+  speechService = inject(SpeechService);
   private snackBar = inject(MatSnackBar);
 
   editId = signal<string | null>(null);
