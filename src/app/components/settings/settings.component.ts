@@ -13,6 +13,7 @@ import { ClaudeTranslationService } from '../../services/translation/claude-tran
 import { TranslationManagerService, ProviderType } from '../../services/translation/translation-manager.service';
 import { TtsCacheService } from '../../services/tts/tts-cache.service';
 import { VocabularyService } from '../../services/vocabulary.service';
+import {MatTooltip} from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-settings',
@@ -27,6 +28,7 @@ import { VocabularyService } from '../../services/vocabulary.service';
     MatRadioModule,
     MatDividerModule,
     MatListModule,
+    MatTooltip,
   ],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.css',
