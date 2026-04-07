@@ -51,6 +51,32 @@
   width: 100%;
 }
 
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.type-badge mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.verb-badge {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.word-badge {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+
 .actions-cell {
   white-space: nowrap;
   text-align: right;

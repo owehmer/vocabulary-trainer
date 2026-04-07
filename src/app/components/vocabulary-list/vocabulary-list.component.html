@@ -31,6 +31,23 @@
   } @else {
     <mat-card>
       <table mat-table [dataSource]="vocabulary" class="vocab-table">
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef>Typ</th>
+          <td mat-cell *matCellDef="let row">
+            @if (row.type === 'verb') {
+              <span class="type-badge verb-badge" matTooltip="Verb mit {{ row.verbConjugations?.length || 0 }} Konjugationen">
+                <mat-icon>menu_book</mat-icon>
+                Verb ({{ row.verbConjugations?.length || 0 }})
+              </span>
+            } @else {
+              <span class="type-badge word-badge" matTooltip="Wort/Satz">
+                <mat-icon>text_fields</mat-icon>
+                Wort
+              </span>
+            }
+          </td>
+        </ng-container>
+
         <ng-container matColumnDef="german">
           <th mat-header-cell *matHeaderCellDef>Deutsch</th>
           <td mat-cell *matCellDef="let row">{{ row.german }}</td>

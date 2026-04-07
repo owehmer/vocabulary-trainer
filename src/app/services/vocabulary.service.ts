@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { Vocabulary } from '../models/vocabulary.model';
+import { Vocabulary, VerbConjugation, TrainingCard } from '../models/vocabulary.model';
 
 const STORAGE_KEY = 'vokabel_vocabulary';
 
@@ -12,7 +12,12 @@ export class VocabularyService {
   private load(): Vocabulary[] {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
+      const items = raw ? JSON.parse(raw) : [];
+      // Migrate old entries without type
+      return items.map((item: any) => ({
+        ...item,
+        type: item.type || 'word',
+      }));
     } catch {
       return [];
     }
@@ -36,6 +41,22 @@ export class VocabularyService {
       german,
       swissGerman,
       createdAt: new Date().toISOString(),
+      type: 'word',
+    };
+    const updated = [...this._vocabulary(), entry];
+    this._vocabulary.set(updated);
+    this.save(updated);
+    return entry;
+  }
+
+  addVerb(infinitiveGerman: string, infinitiveSwiss: string, conjugations: VerbConjugation[]): Vocabulary {
+    const entry: Vocabulary = {
+      id: crypto.randomUUID(),
+      german: infinitiveGerman,
+      swissGerman: infinitiveSwiss,
+      createdAt: new Date().toISOString(),
+      type: 'verb',
+      verbConjugations: conjugations,
     };
     const updated = [...this._vocabulary(), entry];
     this._vocabulary.set(updated);
@@ -51,10 +72,63 @@ export class VocabularyService {
     this.save(updated);
   }
 
+  updateVerb(id: string, infinitiveGerman: string, infinitiveSwiss: string, conjugations: VerbConjugation[]): void {
+    const updated = this._vocabulary().map(v =>
+      v.id === id ? { ...v, german: infinitiveGerman, swissGerman: infinitiveSwiss, verbConjugations: conjugations } : v
+    );
+    this._vocabulary.set(updated);
+    this.save(updated);
+  }
+
   delete(id: string): void {
     const updated = this._vocabulary().filter(v => v.id !== id);
     this._vocabulary.set(updated);
     this.save(updated);
+  }
+
+  /**
+   * Get training cards from vocabulary entries.
+   * For words: returns single card.
+   * For verbs: returns card for each conjugation (tense + person).
+   */
+  getTrainingCards(): TrainingCard[] {
+    const cards: TrainingCard[] = [];
+
+    for (const vocab of this._vocabulary()) {
+      if (vocab.type === 'word') {
+        cards.push({
+          id: vocab.id,
+          german: vocab.german,
+          swissGerman: vocab.swissGerman,
+          sourceVocabId: vocab.id,
+          isVerbConjugation: false,
+        });
+      } else if (vocab.type === 'verb' && vocab.verbConjugations) {
+        // Add infinitive as separate card
+        cards.push({
+          id: vocab.id,
+          german: vocab.german,
+          swissGerman: vocab.swissGerman,
+          sourceVocabId: vocab.id,
+          isVerbConjugation: false,
+        });
+
+        // Add each conjugation as separate card
+        for (const conj of vocab.verbConjugations) {
+          cards.push({
+            id: `${vocab.id}-${conj.tense}-${conj.person}`,
+            german: `${conj.person} ${conj.germanForm} (${conj.tense})`,
+            swissGerman: conj.swissGermanForm,
+            sourceVocabId: vocab.id,
+            isVerbConjugation: true,
+            tense: conj.tense,
+            person: conj.person,
+          });
+        }
+      }
+    }
+
+    return cards;
   }
 
   exportJson(): void {

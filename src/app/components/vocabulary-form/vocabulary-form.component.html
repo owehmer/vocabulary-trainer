@@ -4,15 +4,29 @@
       <mat-card-title>{{ isEdit ? 'Vokabel bearbeiten' : 'Neue Vokabel' }}</mat-card-title>
     </mat-card-header>
     <mat-card-content>
+      <!-- Type Selection (only for new entries) -->
+      @if (!isEdit) {
+        <div class="type-selection">
+          <label class="section-label">Typ:</label>
+          <mat-radio-group [(ngModel)]="type" class="type-radio-group">
+            <mat-radio-button value="word">Wort/Satz</mat-radio-button>
+            <mat-radio-button value="verb">Verb</mat-radio-button>
+          </mat-radio-group>
+        </div>
+      }
+
+      <!-- Infinitive / Base Form -->
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Deutsch</mat-label>
-        <input matInput [value]="german()" (input)="german.set($any($event.target).value)" placeholder="z.B. Fahrrad" />
+        <mat-label>{{ isVerb ? 'Infinitiv (Deutsch)' : 'Deutsch' }}</mat-label>
+        <input matInput [value]="german()" (input)="german.set($any($event.target).value)"
+               [placeholder]="isVerb ? 'z.B. gehen' : 'z.B. Fahrrad'" />
       </mat-form-field>
 
       <div class="swiss-row">
         <mat-form-field appearance="outline" class="swiss-field">
-          <mat-label>Zürichdeutsch</mat-label>
-          <input matInput [value]="swissGerman()" (input)="swissGerman.set($any($event.target).value)" placeholder="z.B. Velo" />
+          <mat-label>{{ isVerb ? 'Infinitiv (Zürichdeutsch)' : 'Zürichdeutsch' }}</mat-label>
+          <input matInput [value]="swissGerman()" (input)="swissGerman.set($any($event.target).value)"
+                 [placeholder]="isVerb ? 'z.B. gaa' : 'z.B. Velo'" />
         </mat-form-field>
 
         <button
@@ -42,10 +56,97 @@
           <mat-icon>{{ ttsManager.isSpeaking() ? 'stop' : 'volume_up' }}</mat-icon>
         </button>
       </div>
+
+      <!-- Verb Conjugations Section -->
+      @if (isVerb) {
+        <mat-card class="conjugation-section">
+          <mat-card-header>
+            <mat-card-title>Konjugationen</mat-card-title>
+            <mat-card-subtitle>Füge verschiedene Tempus und Personen hinzu</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <!-- Add Conjugation Form -->
+            <div class="conjugation-form">
+              <mat-form-field appearance="outline" class="tense-field">
+                <mat-label>Tempus</mat-label>
+                <mat-select [(ngModel)]="selectedTense">
+                  @for (tense of tenses; track tense) {
+                    <mat-option [value]="tense">{{ tense }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="person-field">
+                <mat-label>Person</mat-label>
+                <mat-select [(ngModel)]="selectedPerson">
+                  @for (person of persons; track person) {
+                    <mat-option [value]="person">{{ person }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Deutsche Form</mat-label>
+                <input matInput [(ngModel)]="germanForm" placeholder="z.B. gehe" />
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Schweizer Form</mat-label>
+                <input matInput [(ngModel)]="swissGermanForm" placeholder="z.B. gang" />
+              </mat-form-field>
+
+              <button mat-flat-button color="primary" (click)="addConjugation()" type="button">
+                <mat-icon>add</mat-icon>
+                Hinzufügen
+              </button>
+            </div>
+
+            <!-- Conjugations Table -->
+            @if (conjugations().length > 0) {
+              <table mat-table [dataSource]="conjugations()" class="conjugations-table">
+                <ng-container matColumnDef="tense">
+                  <th mat-header-cell *matHeaderCellDef>Tempus</th>
+                  <td mat-cell *matCellDef="let row">{{ row.tense }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="person">
+                  <th mat-header-cell *matHeaderCellDef>Person</th>
+                  <td mat-cell *matCellDef="let row">{{ row.person }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="german">
+                  <th mat-header-cell *matHeaderCellDef>Deutsch</th>
+                  <td mat-cell *matCellDef="let row">{{ row.germanForm }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="swiss">
+                  <th mat-header-cell *matHeaderCellDef>Zürichdeutsch</th>
+                  <td mat-cell *matCellDef="let row">{{ row.swissGermanForm }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef></th>
+                  <td mat-cell *matCellDef="let row">
+                    <button mat-icon-button color="warn" (click)="deleteConjugation(row)" matTooltip="Löschen">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="conjugationColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: conjugationColumns;"></tr>
+              </table>
+            } @else {
+              <p class="empty-conjugations">Noch keine Konjugationen hinzugefügt</p>
+            }
+          </mat-card-content>
+        </mat-card>
+      }
     </mat-card-content>
     <mat-card-actions align="end">
       <a mat-button routerLink="/">Abbrechen</a>
-      <button mat-flat-button color="primary" (click)="save()" [disabled]="!german().trim() || !swissGerman().trim()">
+      <button mat-flat-button color="primary" (click)="save()"
+              [disabled]="!german().trim() || !swissGerman().trim() || (isVerb && conjugations().length === 0)">
         <mat-icon>save</mat-icon>
         Speichern
       </button>

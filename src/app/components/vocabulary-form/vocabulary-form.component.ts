@@ -9,9 +9,16 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatSelectModule } from '@angular/material/select';
+import { MatTableModule } from '@angular/material/table';
 import { VocabularyService } from '../../services/vocabulary.service';
 import { TranslationManagerService } from '../../services/translation/translation-manager.service';
 import { TtsManagerService } from '../../services/tts/tts-manager.service';
+import { VocabularyType, VerbConjugation } from '../../models/vocabulary.model';
+
+const TENSES = ['Präsens', 'Präteritum', 'Perfekt', 'Futur'];
+const PERSONS = ['ich', 'du', 'er/sie/es', 'wir', 'ihr', 'sie/Sie'];
 
 @Component({
   selector: 'app-vocabulary-form',
@@ -26,6 +33,9 @@ import { TtsManagerService } from '../../services/tts/tts-manager.service';
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatTooltipModule,
+    MatRadioModule,
+    MatSelectModule,
+    MatTableModule,
   ],
   templateUrl: './vocabulary-form.component.html',
   styleUrl: './vocabulary-form.component.css',
@@ -39,12 +49,28 @@ export class VocabularyFormComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
 
   editId = signal<string | null>(null);
+  type = signal<VocabularyType>('word');
   german = signal('');
   swissGerman = signal('');
   generating = signal(false);
 
+  // Verb conjugation
+  conjugations = signal<VerbConjugation[]>([]);
+  selectedTense = signal('Präsens');
+  selectedPerson = signal('ich');
+  germanForm = signal('');
+  swissGermanForm = signal('');
+
+  tenses = TENSES;
+  persons = PERSONS;
+  conjugationColumns = ['tense', 'person', 'german', 'swiss', 'actions'];
+
   get isEdit() {
     return this.editId() !== null;
+  }
+
+  get isVerb() {
+    return this.type() === 'verb';
   }
 
   ngOnInit(): void {
@@ -53,8 +79,12 @@ export class VocabularyFormComponent implements OnInit {
       const entry = this.vocabService.getById(id);
       if (entry) {
         this.editId.set(id);
+        this.type.set(entry.type);
         this.german.set(entry.german);
         this.swissGerman.set(entry.swissGerman);
+        if (entry.type === 'verb' && entry.verbConjugations) {
+          this.conjugations.set([...entry.verbConjugations]);
+        }
       } else {
         this.router.navigate(['/']);
       }
@@ -84,17 +114,68 @@ export class VocabularyFormComponent implements OnInit {
     }
   }
 
+  addConjugation(): void {
+    const gf = this.germanForm().trim();
+    const sf = this.swissGermanForm().trim();
+
+    if (!gf || !sf) {
+      this.snackBar.open('Beide Konjugationsformen müssen ausgefüllt sein', 'OK', { duration: 3000 });
+      return;
+    }
+
+    const existing = this.conjugations().find(
+      c => c.tense === this.selectedTense() && c.person === this.selectedPerson()
+    );
+
+    if (existing) {
+      this.snackBar.open('Diese Kombination existiert bereits', 'OK', { duration: 3000 });
+      return;
+    }
+
+    const newConj: VerbConjugation = {
+      tense: this.selectedTense(),
+      person: this.selectedPerson(),
+      germanForm: gf,
+      swissGermanForm: sf,
+    };
+
+    this.conjugations.update(conjs => [...conjs, newConj]);
+    this.germanForm.set('');
+    this.swissGermanForm.set('');
+  }
+
+  deleteConjugation(conj: VerbConjugation): void {
+    this.conjugations.update(conjs =>
+      conjs.filter(c => !(c.tense === conj.tense && c.person === conj.person))
+    );
+  }
+
   save(): void {
     const g = this.german().trim();
     const s = this.swissGerman().trim();
+
     if (!g || !s) {
       this.snackBar.open('Beide Felder müssen ausgefüllt sein', 'OK', { duration: 3000 });
       return;
     }
+
+    if (this.isVerb && this.conjugations().length === 0) {
+      this.snackBar.open('Füge mindestens eine Konjugation hinzu', 'OK', { duration: 3000 });
+      return;
+    }
+
     if (this.isEdit) {
-      this.vocabService.update(this.editId()!, g, s);
+      if (this.isVerb) {
+        this.vocabService.updateVerb(this.editId()!, g, s, this.conjugations());
+      } else {
+        this.vocabService.update(this.editId()!, g, s);
+      }
     } else {
-      this.vocabService.add(g, s);
+      if (this.isVerb) {
+        this.vocabService.addVerb(g, s, this.conjugations());
+      } else {
+        this.vocabService.add(g, s);
+      }
     }
     this.router.navigate(['/']);
   }

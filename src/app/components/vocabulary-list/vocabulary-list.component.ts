@@ -29,7 +29,7 @@ export class VocabularyListComponent {
   ttsManager = inject(TtsManagerService);
   private snackBar = inject(MatSnackBar);
 
-  displayedColumns = ['german', 'swissGerman', 'actions'];
+  displayedColumns = ['type', 'german', 'swissGerman', 'actions'];
   importing = signal(false);
 
   get vocabulary() {

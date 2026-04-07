@@ -13,7 +13,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { VocabularyService } from '../../services/vocabulary.service';
 import { ClaudeTranslationService, ExampleSentence } from '../../services/translation/claude-translation.service';
 import { TtsManagerService } from '../../services/tts/tts-manager.service';
-import { Vocabulary } from '../../models/vocabulary.model';
+import { TrainingCard } from '../../models/vocabulary.model';
 import { TrainingMode } from '../training-config/training-config.component';
 
 @Component({
@@ -42,7 +42,7 @@ export class TrainingSessionComponent implements OnInit {
   ttsManager = inject(TtsManagerService);
 
   mode = signal<TrainingMode>('flashcard');
-  vocabulary = signal<Vocabulary[]>([]);
+  trainingCards = signal<TrainingCard[]>([]);
   currentIndex = signal(0);
   correct = signal(0);
   wrong = signal(0);
@@ -66,10 +66,10 @@ export class TrainingSessionComponent implements OnInit {
   // Session state
   finished = signal(false);
 
-  current = computed(() => this.vocabulary()[this.currentIndex()]);
+  current = computed(() => this.trainingCards()[this.currentIndex()]);
 
   progress = computed(() => {
-    const total = this.vocabulary().length;
+    const total = this.trainingCards().length;
     return total > 0 ? (this.currentIndex() / total) * 100 : 0;
   });
 
@@ -84,9 +84,9 @@ export class TrainingSessionComponent implements OnInit {
     const modeParam = this.route.snapshot.queryParamMap.get('mode') as TrainingMode;
     this.mode.set(modeParam ?? 'flashcard');
 
-    const all = this.vocabService.getAll();
-    const shuffled = [...all].sort(() => Math.random() - 0.5);
-    this.vocabulary.set(shuffled);
+    const cards = this.vocabService.getTrainingCards();
+    const shuffled = [...cards].sort(() => Math.random() - 0.5);
+    this.trainingCards.set(shuffled);
 
     if (shuffled.length === 0) {
       this.router.navigate(['/training']);
@@ -110,14 +110,14 @@ export class TrainingSessionComponent implements OnInit {
   }
 
   private buildOptions(): void {
-    const all = this.vocabulary();
+    const all = this.trainingCards();
     const current = this.current();
     const correct = current.swissGerman;
     const others = all
-      .filter(v => v.id !== current.id)
+      .filter(c => c.id !== current.id)
       .sort(() => Math.random() - 0.5)
       .slice(0, 3)
-      .map(v => v.swissGerman);
+      .map(c => c.swissGerman);
 
     const opts = [correct, ...others].sort(() => Math.random() - 0.5);
     this.options.set(opts);
@@ -161,7 +161,7 @@ export class TrainingSessionComponent implements OnInit {
 
   next(): void {
     const nextIndex = this.currentIndex() + 1;
-    if (nextIndex >= this.vocabulary().length) {
+    if (nextIndex >= this.trainingCards().length) {
       this.finished.set(true);
     } else {
       this.currentIndex.set(nextIndex);
@@ -192,8 +192,8 @@ export class TrainingSessionComponent implements OnInit {
     this.correct.set(0);
     this.wrong.set(0);
     this.finished.set(false);
-    const shuffled = [...this.vocabulary()].sort(() => Math.random() - 0.5);
-    this.vocabulary.set(shuffled);
+    const shuffled = [...this.trainingCards()].sort(() => Math.random() - 0.5);
+    this.trainingCards.set(shuffled);
     this.prepareCurrentCard();
   }
 
@@ -221,7 +221,7 @@ export class TrainingSessionComponent implements OnInit {
     }
     const current = this.current();
     if (current) {
-      this.ttsManager.speakWithCache(current.swissGerman, current.id, 'swiss');
+      this.ttsManager.speakWithCache(current.swissGerman, current.sourceVocabId, 'swiss');
     }
   }
 
@@ -235,7 +235,7 @@ export class TrainingSessionComponent implements OnInit {
     const current = this.current();
     const example = this.exampleSentence();
     if (current && example) {
-      this.ttsManager.speakWithCache(example.swiss, current.id, 'example');
+      this.ttsManager.speakWithCache(example.swiss, current.sourceVocabId, 'example');
     }
   }
 }

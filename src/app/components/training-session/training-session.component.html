@@ -39,7 +39,7 @@
       <a mat-icon-button routerLink="/training" matTooltip="Training beenden">
         <mat-icon>close</mat-icon>
       </a>
-      <span class="progress-label">{{ currentIndex() + 1 }} / {{ vocabulary().length }}</span>
+      <span class="progress-label">{{ currentIndex() + 1 }} / {{ trainingCards().length }}</span>
       <mat-progress-bar mode="determinate" [value]="progress()" class="progress-bar"></mat-progress-bar>
       <span class="score-inline">
         <mat-icon class="score-icon correct-icon">check</mat-icon>{{ correct() }}
