@@ -75,17 +75,17 @@
 
       <div class="cache-stats">
         <div class="stat-item">
-          <strong>{{ cacheStats().cached }}</strong> von <strong>{{ cacheStats().total }}</strong> Vokabeln gecacht
+          <strong>{{ cacheStats().count }}</strong> Audio-Dateien gecacht
         </div>
         <div class="stat-item">
-          <strong>{{ cacheStats().cacheSize }} KB</strong> Speicher verwendet
+          <strong>{{ cacheStats().sizeKB }} KB</strong> Speicher verwendet
         </div>
       </div>
 
-      @if (allCachedVocabularies().length > 0) {
+      @if (allCachedAudio().length > 0) {
         <div class="cached-vocab-section">
           <div class="section-header">
-            <h4>Gecachte Vokabeln</h4>
+            <h4>Gecachte Audio-Dateien</h4>
             <button mat-stroked-button color="warn" (click)="clearAllCache()">
               <mat-icon>delete_sweep</mat-icon>
               Alle löschen
@@ -94,12 +94,12 @@
 
           <!-- Search input -->
           <mat-form-field appearance="outline" class="search-field">
-            <mat-label>Vokabeln suchen</mat-label>
+            <mat-label>Audio suchen</mat-label>
             <input
               matInput
               [(ngModel)]="cacheSearchQuery"
               (ngModelChange)="onSearchChange()"
-              placeholder="Nach Deutsch oder Schweizerdeutsch suchen..."
+              placeholder="Nach Text suchen..."
             />
             <mat-icon matPrefix>search</mat-icon>
             @if (cacheSearchQuery()) {
@@ -109,29 +109,21 @@
             }
           </mat-form-field>
 
-          @if (filteredCachedVocabularies().length === 0) {
-            <p class="empty-cache-text">Keine Vokabeln gefunden.</p>
+          @if (filteredCachedAudio().length === 0) {
+            <p class="empty-cache-text">Keine Audio-Dateien gefunden.</p>
           } @else {
             <mat-list class="cached-vocab-list">
-              @for (vocab of paginatedCachedVocabularies(); track vocab.id) {
+              @for (entry of paginatedCachedAudio(); track entry.text) {
                 <mat-list-item>
                   <div class="vocab-cache-item">
                     <div class="vocab-text">
-                      <span class="vocab-german">{{ vocab.german }}</span>
-                      <span class="vocab-swiss">{{ vocab.swissGerman }}</span>
+                      <span class="vocab-swiss">{{ entry.text }}</span>
                     </div>
                     <div class="cache-badges">
-                      @if (vocab.audioCache?.swissGermanAudio) {
-                        <span class="cache-badge" matTooltip="Wort gecacht">
-                          <mat-icon>volume_up</mat-icon>
-                        </span>
-                      }
-                      @if (vocab.audioCache?.exampleSentenceAudio) {
-                        <span class="cache-badge" matTooltip="Beispielsatz gecacht">
-                          <mat-icon>format_quote</mat-icon>
-                        </span>
-                      }
-                      <button mat-icon-button (click)="clearVocabCache(vocab.id)" matTooltip="Cache löschen">
+                      <span class="cache-badge" matTooltip="Audio gecacht">
+                        <mat-icon>volume_up</mat-icon>
+                      </span>
+                      <button mat-icon-button (click)="clearAudioCache(entry.text)" matTooltip="Cache löschen">
                         <mat-icon>delete</mat-icon>
                       </button>
                     </div>
@@ -148,7 +140,7 @@
                 </button>
                 <span class="page-info">
                   Seite {{ currentPage() + 1 }} von {{ totalPages() }}
-                  <span class="item-count">({{ filteredCachedVocabularies().length }} Vokabeln)</span>
+                  <span class="item-count">({{ filteredCachedAudio().length }} Audio-Dateien)</span>
                 </span>
                 <button mat-icon-button (click)="nextPage()" [disabled]="!hasNextPage()" matTooltip="Nächste Seite">
                   <mat-icon>chevron_right</mat-icon>

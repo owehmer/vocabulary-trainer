@@ -154,6 +154,12 @@
   text-overflow: ellipsis;
 }
 
+.cache-date {
+  font-size: 11px;
+  color: #999;
+  font-style: italic;
+}
+
 .cache-badges {
   display: flex;
   align-items: center;

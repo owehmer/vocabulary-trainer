@@ -43,9 +43,9 @@ export class VocabularyService {
     return entry;
   }
 
-  update(id: string, german: string, swissGerman: string, audioCache?: { swissGermanAudio?: string; exampleSentenceAudio?: string }): void {
+  update(id: string, german: string, swissGerman: string): void {
     const updated = this._vocabulary().map(v =>
-      v.id === id ? { ...v, german, swissGerman, audioCache } : v
+      v.id === id ? { ...v, german, swissGerman } : v
     );
     this._vocabulary.set(updated);
     this.save(updated);

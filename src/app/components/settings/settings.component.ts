@@ -1,5 +1,6 @@
 import { Component, signal, inject, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { DatePipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -12,7 +13,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ClaudeTranslationService } from '../../services/translation/claude-translation.service';
 import { TranslationManagerService, ProviderType } from '../../services/translation/translation-manager.service';
-import { TtsCacheService } from '../../services/tts/tts-cache.service';
+import { AudioCacheStorageService } from '../../services/tts/audio-cache-storage.service';
 import { VocabularyService } from '../../services/vocabulary.service';
 import {MatTooltip} from '@angular/material/tooltip';
 
@@ -20,6 +21,7 @@ import {MatTooltip} from '@angular/material/tooltip';
   selector: 'app-settings',
   imports: [
     FormsModule,
+    DatePipe,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
@@ -37,7 +39,7 @@ import {MatTooltip} from '@angular/material/tooltip';
 export class SettingsComponent {
   protected claudeService = inject(ClaudeTranslationService);
   protected translationManager = inject(TranslationManagerService);
-  protected ttsCacheService = inject(TtsCacheService);
+  protected audioCacheStorage = inject(AudioCacheStorageService);
   protected vocabService = inject(VocabularyService);
   private snackBar = inject(MatSnackBar);
 
@@ -50,34 +52,31 @@ export class SettingsComponent {
   currentPage = signal(0);
   pageSize = 10;
 
-  cacheStats = computed(() => this.ttsCacheService.getCacheStats());
+  cacheStats = computed(() => this.audioCacheStorage.getCacheStats());
 
-  allCachedVocabularies = computed(() => {
-    return this.vocabService.vocabulary().filter(v =>
-      v.audioCache?.swissGermanAudio || v.audioCache?.exampleSentenceAudio
-    );
+  allCachedAudio = computed(() => {
+    return this.audioCacheStorage.getAllCached();
   });
 
-  filteredCachedVocabularies = computed(() => {
+  filteredCachedAudio = computed(() => {
     const query = this.cacheSearchQuery().toLowerCase().trim();
     if (!query) {
-      return this.allCachedVocabularies();
+      return this.allCachedAudio();
     }
-    return this.allCachedVocabularies().filter(v =>
-      v.german.toLowerCase().includes(query) ||
-      v.swissGerman.toLowerCase().includes(query)
+    return this.allCachedAudio().filter(entry =>
+      entry.text.includes(query)
     );
   });
 
-  paginatedCachedVocabularies = computed(() => {
-    const filtered = this.filteredCachedVocabularies();
+  paginatedCachedAudio = computed(() => {
+    const filtered = this.filteredCachedAudio();
     const start = this.currentPage() * this.pageSize;
     const end = start + this.pageSize;
     return filtered.slice(start, end);
   });
 
   totalPages = computed(() => {
-    return Math.ceil(this.filteredCachedVocabularies().length / this.pageSize);
+    return Math.ceil(this.filteredCachedAudio().length / this.pageSize);
   });
 
   hasNextPage = computed(() => this.currentPage() < this.totalPages() - 1);
@@ -95,14 +94,14 @@ export class SettingsComponent {
 
   clearAllCache(): void {
     if (confirm('Wirklich alle Audio-Caches löschen? Die Audiodaten können jederzeit neu generiert werden.')) {
-      this.ttsCacheService.clearAllCache();
+      this.audioCacheStorage.clearAllCache();
       this.currentPage.set(0);
       this.snackBar.open('Audio-Cache geleert', 'OK', { duration: 2000 });
     }
   }
 
-  clearVocabCache(vocabId: string): void {
-    this.ttsCacheService.clearVocabularyCache(vocabId);
+  clearAudioCache(text: string): void {
+    this.audioCacheStorage.clearCachedAudio(text);
     this.snackBar.open('Cache gelöscht', 'OK', { duration: 1500 });
 
     // Adjust page if current page is now empty

@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { ITtsProvider } from './tts-provider.interface';
 import { PlappariTtsService } from './plappari-tts.service';
 import { BrowserTtsService } from './browser-tts.service';
-import { TtsCacheService } from './tts-cache.service';
+import { AudioCacheStorageService } from './audio-cache-storage.service';
 
 const PROVIDER_STORAGE = 'vokabel_tts_provider';
 
@@ -16,7 +16,7 @@ export type TtsProviderType = 'plapperi' | 'browser';
 export class TtsManagerService {
   private plapperiService = inject(PlappariTtsService);
   private browserService = inject(BrowserTtsService);
-  private cacheService = inject(TtsCacheService);
+  private audioCacheStorage = inject(AudioCacheStorageService);
 
   /**
    * Get the current active TTS provider
@@ -71,8 +71,8 @@ export class TtsManagerService {
   /**
    * Speak with caching support for vocabulary
    * @param text Text to speak
-   * @param vocabularyId ID of the vocabulary entry
-   * @param cacheType Type of cache (swiss or example)
+   * @param vocabularyId ID of the vocabulary entry (optional, for backward compatibility)
+   * @param cacheType Type of cache (swiss or example) - not used anymore, kept for compatibility
    */
   async speakWithCache(
     text: string,
@@ -87,15 +87,13 @@ export class TtsManagerService {
 
     // Only use cache with Plapperi provider (browser TTS doesn't need caching)
     const preferredType = this.getPreferredProviderType();
-    if (preferredType !== 'plapperi' || !vocabularyId) {
+    if (preferredType !== 'plapperi') {
       return this.speak(text);
     }
 
     try {
-      // Check cache first
-      const cachedAudio = cacheType === 'swiss'
-        ? this.cacheService.getCachedSwissAudio(vocabularyId)
-        : this.cacheService.getCachedExampleAudio(vocabularyId);
+      // Check global cache first
+      const cachedAudio = this.audioCacheStorage.getCachedAudio(text);
 
       if (cachedAudio) {
         // Play from cache
@@ -104,12 +102,8 @@ export class TtsManagerService {
         // Generate and cache
         const audioData = await this.plapperiService.speakAndCache(text);
 
-        // Cache the audio
-        if (cacheType === 'swiss') {
-          this.cacheService.cacheSwissAudio(vocabularyId, audioData);
-        } else {
-          this.cacheService.cacheExampleAudio(vocabularyId, audioData);
-        }
+        // Cache the audio globally (by text, not by vocabulary ID)
+        this.audioCacheStorage.cacheAudio(text, audioData);
 
         // Play the audio
         await this.plapperiService.playAudioData(audioData);
