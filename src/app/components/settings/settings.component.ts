@@ -7,8 +7,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatRadioModule } from '@angular/material/radio';
-import { ClaudeService } from '../../services/claude.service';
-import { TranslationManagerService, ProviderType } from '../../services/translation-manager.service';
+import { ClaudeTranslationService } from '../../services/translation/claude-translation.service';
+import { TranslationManagerService, ProviderType } from '../../services/translation/translation-manager.service';
 
 @Component({
   selector: 'app-settings',
@@ -26,7 +26,7 @@ import { TranslationManagerService, ProviderType } from '../../services/translat
   styleUrl: './settings.component.css',
 })
 export class SettingsComponent {
-  protected claudeService = inject(ClaudeService);
+  protected claudeService = inject(ClaudeTranslationService);
   protected translationManager = inject(TranslationManagerService);
   private snackBar = inject(MatSnackBar);
 

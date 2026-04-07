@@ -31,18 +31,16 @@
           Übersetzen
         </button>
 
-        @if (speechService.supported) {
-          <button
-            mat-icon-button
-            type="button"
-            class="speak-btn"
-            (click)="speechService.speak(swissGerman())"
-            [disabled]="!swissGerman().trim()"
-            matTooltip="Aussprechen"
-          >
-            <mat-icon>{{ speechService.speaking() ? 'stop' : 'volume_up' }}</mat-icon>
-          </button>
-        }
+        <button
+          mat-icon-button
+          type="button"
+          class="speak-btn"
+          (click)="ttsManager.speak(swissGerman())"
+          [disabled]="!swissGerman().trim()"
+          [matTooltip]="'Aussprechen mit ' + ttsManager.getCurrentProviderName()"
+        >
+          <mat-icon>{{ ttsManager.isSpeaking() ? 'stop' : 'volume_up' }}</mat-icon>
+        </button>
       </div>
     </mat-card-content>
     <mat-card-actions align="end">

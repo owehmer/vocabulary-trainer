@@ -44,11 +44,9 @@
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef></th>
           <td mat-cell *matCellDef="let row" class="actions-cell">
-            @if (speechService.supported) {
-              <button mat-icon-button (click)="speechService.speak(row.swissGerman)" matTooltip="Aussprechen">
-                <mat-icon>{{ speechService.speaking() ? 'stop' : 'volume_up' }}</mat-icon>
-              </button>
-            }
+            <button mat-icon-button (click)="ttsManager.speak(row.swissGerman)" matTooltip="Aussprechen">
+              <mat-icon>{{ ttsManager.isSpeaking() ? 'stop' : 'volume_up' }}</mat-icon>
+            </button>
             <a mat-icon-button [routerLink]="['/vocabulary', row.id, 'edit']" matTooltip="Bearbeiten">
               <mat-icon>edit</mat-icon>
             </a>

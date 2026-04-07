@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { ITranslationProvider } from './translation-provider.interface';
-import { ClaudeService } from './claude.service';
-import { TranslationService } from './translation.service';
+import { ClaudeTranslationService } from './claude-translation.service';
+import { PlappariTranslationService } from './plappari-translation.service';
 
 const PROVIDER_STORAGE = 'vokabel_translation_provider';
 
@@ -13,8 +13,8 @@ export type ProviderType = 'plapperi' | 'claude';
  */
 @Injectable({ providedIn: 'root' })
 export class TranslationManagerService {
-  private claudeService = inject(ClaudeService);
-  private plapperiService = inject(TranslationService);
+  private claudeService = inject(ClaudeTranslationService);
+  private plapperiService = inject(PlappariTranslationService);
 
   /**
    * Get the current active translation provider

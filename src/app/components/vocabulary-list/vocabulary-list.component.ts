@@ -7,7 +7,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { VocabularyService } from '../../services/vocabulary.service';
-import { SpeechService } from '../../services/speech.service';
+import { TtsManagerService } from '../../services/tts-manager.service';
 import { Vocabulary } from '../../models/vocabulary.model';
 
 @Component({
@@ -26,7 +26,7 @@ import { Vocabulary } from '../../models/vocabulary.model';
 })
 export class VocabularyListComponent {
   vocabService = inject(VocabularyService);
-  speechService = inject(SpeechService);
+  ttsManager = inject(TtsManagerService);
   private snackBar = inject(MatSnackBar);
 
   displayedColumns = ['german', 'swissGerman', 'actions'];

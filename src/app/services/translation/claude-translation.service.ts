@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 import { ITranslationProvider } from './translation-provider.interface';
 
 const API_KEY_STORAGE = 'vokabel_api_key';
@@ -12,7 +12,7 @@ export interface ExampleSentence {
 }
 
 @Injectable({ providedIn: 'root' })
-export class ClaudeService implements ITranslationProvider {
+export class ClaudeTranslationService implements ITranslationProvider {
   getApiKey(): string {
     return environment.claudeApiKey || localStorage.getItem(API_KEY_STORAGE) || '';
   }

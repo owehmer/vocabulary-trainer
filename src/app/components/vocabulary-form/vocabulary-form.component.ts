@@ -10,8 +10,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { VocabularyService } from '../../services/vocabulary.service';
-import { TranslationManagerService } from '../../services/translation-manager.service';
-import { SpeechService } from '../../services/speech.service';
+import { TranslationManagerService } from '../../services/translation/translation-manager.service';
+import { TtsManagerService } from '../../services/tts-manager.service';
 
 @Component({
   selector: 'app-vocabulary-form',
@@ -35,7 +35,7 @@ export class VocabularyFormComponent implements OnInit {
   private router = inject(Router);
   private vocabService = inject(VocabularyService);
   translationManager = inject(TranslationManagerService);
-  speechService = inject(SpeechService);
+  ttsManager = inject(TtsManagerService);
   private snackBar = inject(MatSnackBar);
 
   editId = signal<string | null>(null);

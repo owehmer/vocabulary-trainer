@@ -15,7 +15,7 @@ export interface TranslationResponse {
 }
 
 @Injectable({ providedIn: 'root' })
-export class TranslationService implements ITranslationProvider {
+export class PlappariTranslationService implements ITranslationProvider {
   private defaultDialect = 'zh'; // Zürich dialect
 
   // ITranslationProvider implementation
