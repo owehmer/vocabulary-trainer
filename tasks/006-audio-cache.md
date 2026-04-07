@@ -47,18 +47,25 @@ Implement local caching of TTS audio to avoid unnecessary API calls and improve 
 - **vocabulary-form.component.ts**: Added `speakSwissGerman()` with caching (only when editing)
 - **settings.component.ts**:
   - Added cache statistics display
-  - Added list of cached vocabularies
+  - Added search functionality with `cacheSearchQuery` signal
+  - Added pagination with 10 items per page
+  - Added computed signals for filtered and paginated vocabularies
   - Added `clearAllCache()`: Delete all cached audio
   - Added `clearVocabCache()`: Delete cache for specific vocabulary
+  - Added `onSearchChange()`: Reset pagination when searching
+  - Added `nextPage()`, `prevPage()`, `goToPage()`: Pagination controls
 
 ### UI Changes
 - **settings.component.html**:
   - New "Audio Cache" section showing:
     - Cache statistics (count and size)
-    - List of cached vocabularies with badges indicating what's cached
+    - Search field to filter cached vocabularies
+    - Paginated list of cached vocabularies (10 per page)
+    - Badges indicating what's cached (word vs. example sentence)
     - Individual delete buttons for each vocabulary cache
     - "Delete All" button to clear entire cache
-- **settings.component.css**: Added styling for cache section
+    - Pagination controls (previous/next, page indicator)
+- **settings.component.css**: Added styling for cache section, search field, and pagination
 
 ## Technical Details
 
@@ -78,6 +85,9 @@ Implement local caching of TTS audio to avoid unnecessary API calls and improve 
 - First play of a word/sentence queries API and caches result
 - Subsequent plays use cached audio (instant playback, no API call)
 - Users can view and manage cache in settings if needed
+- Search functionality to quickly find cached vocabularies
+- Pagination (10 items per page) for better performance with many vocabularies
+- Clear visual indicators showing what's cached for each vocabulary
 
 ## Benefits
 1. Reduced API calls to Plapperi service

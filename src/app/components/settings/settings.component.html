@@ -82,7 +82,7 @@
         </div>
       </div>
 
-      @if (cachedVocabularies().length > 0) {
+      @if (allCachedVocabularies().length > 0) {
         <div class="cached-vocab-section">
           <div class="section-header">
             <h4>Gecachte Vokabeln</h4>
@@ -92,33 +92,70 @@
             </button>
           </div>
 
-          <mat-list class="cached-vocab-list">
-            @for (vocab of cachedVocabularies(); track vocab.id) {
-              <mat-list-item>
-                <div class="vocab-cache-item">
-                  <div class="vocab-text">
-                    <span class="vocab-german">{{ vocab.german }}</span>
-                    <span class="vocab-swiss">{{ vocab.swissGerman }}</span>
-                  </div>
-                  <div class="cache-badges">
-                    @if (vocab.audioCache?.swissGermanAudio) {
-                      <span class="cache-badge" matTooltip="Wort gecacht">
-                        <mat-icon>volume_up</mat-icon>
-                      </span>
-                    }
-                    @if (vocab.audioCache?.exampleSentenceAudio) {
-                      <span class="cache-badge" matTooltip="Beispielsatz gecacht">
-                        <mat-icon>format_quote</mat-icon>
-                      </span>
-                    }
-                    <button mat-icon-button (click)="clearVocabCache(vocab.id)" matTooltip="Cache löschen">
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                  </div>
-                </div>
-              </mat-list-item>
+          <!-- Search input -->
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Vokabeln suchen</mat-label>
+            <input
+              matInput
+              [(ngModel)]="cacheSearchQuery"
+              (ngModelChange)="onSearchChange()"
+              placeholder="Nach Deutsch oder Schweizerdeutsch suchen..."
+            />
+            <mat-icon matPrefix>search</mat-icon>
+            @if (cacheSearchQuery()) {
+              <button mat-icon-button matSuffix (click)="cacheSearchQuery.set(''); onSearchChange()" type="button">
+                <mat-icon>close</mat-icon>
+              </button>
             }
-          </mat-list>
+          </mat-form-field>
+
+          @if (filteredCachedVocabularies().length === 0) {
+            <p class="empty-cache-text">Keine Vokabeln gefunden.</p>
+          } @else {
+            <mat-list class="cached-vocab-list">
+              @for (vocab of paginatedCachedVocabularies(); track vocab.id) {
+                <mat-list-item>
+                  <div class="vocab-cache-item">
+                    <div class="vocab-text">
+                      <span class="vocab-german">{{ vocab.german }}</span>
+                      <span class="vocab-swiss">{{ vocab.swissGerman }}</span>
+                    </div>
+                    <div class="cache-badges">
+                      @if (vocab.audioCache?.swissGermanAudio) {
+                        <span class="cache-badge" matTooltip="Wort gecacht">
+                          <mat-icon>volume_up</mat-icon>
+                        </span>
+                      }
+                      @if (vocab.audioCache?.exampleSentenceAudio) {
+                        <span class="cache-badge" matTooltip="Beispielsatz gecacht">
+                          <mat-icon>format_quote</mat-icon>
+                        </span>
+                      }
+                      <button mat-icon-button (click)="clearVocabCache(vocab.id)" matTooltip="Cache löschen">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                </mat-list-item>
+              }
+            </mat-list>
+
+            <!-- Pagination controls -->
+            @if (totalPages() > 1) {
+              <div class="pagination-controls">
+                <button mat-icon-button (click)="prevPage()" [disabled]="!hasPrevPage()" matTooltip="Vorherige Seite">
+                  <mat-icon>chevron_left</mat-icon>
+                </button>
+                <span class="page-info">
+                  Seite {{ currentPage() + 1 }} von {{ totalPages() }}
+                  <span class="item-count">({{ filteredCachedVocabularies().length }} Vokabeln)</span>
+                </span>
+                <button mat-icon-button (click)="nextPage()" [disabled]="!hasNextPage()" matTooltip="Nächste Seite">
+                  <mat-icon>chevron_right</mat-icon>
+                </button>
+              </div>
+            }
+          }
         </div>
       } @else {
         <p class="empty-cache-text">Noch keine Audiodaten gecacht. Spiele Vokabeln ab, um sie zu cachen.</p>

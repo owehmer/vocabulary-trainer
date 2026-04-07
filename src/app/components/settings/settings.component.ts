@@ -9,6 +9,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ClaudeTranslationService } from '../../services/translation/claude-translation.service';
 import { TranslationManagerService, ProviderType } from '../../services/translation/translation-manager.service';
 import { TtsCacheService } from '../../services/tts/tts-cache.service';
@@ -28,7 +29,7 @@ import {MatTooltip} from '@angular/material/tooltip';
     MatRadioModule,
     MatDividerModule,
     MatListModule,
-    MatTooltip,
+    MatTooltipModule,
   ],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.css',
@@ -44,13 +45,43 @@ export class SettingsComponent {
   hideKey = signal(true);
   selectedProvider = signal<ProviderType>(this.translationManager.getPreferredProviderType());
 
+  // Cache management
+  cacheSearchQuery = signal('');
+  currentPage = signal(0);
+  pageSize = 10;
+
   cacheStats = computed(() => this.ttsCacheService.getCacheStats());
 
-  cachedVocabularies = computed(() => {
+  allCachedVocabularies = computed(() => {
     return this.vocabService.vocabulary().filter(v =>
       v.audioCache?.swissGermanAudio || v.audioCache?.exampleSentenceAudio
     );
   });
+
+  filteredCachedVocabularies = computed(() => {
+    const query = this.cacheSearchQuery().toLowerCase().trim();
+    if (!query) {
+      return this.allCachedVocabularies();
+    }
+    return this.allCachedVocabularies().filter(v =>
+      v.german.toLowerCase().includes(query) ||
+      v.swissGerman.toLowerCase().includes(query)
+    );
+  });
+
+  paginatedCachedVocabularies = computed(() => {
+    const filtered = this.filteredCachedVocabularies();
+    const start = this.currentPage() * this.pageSize;
+    const end = start + this.pageSize;
+    return filtered.slice(start, end);
+  });
+
+  totalPages = computed(() => {
+    return Math.ceil(this.filteredCachedVocabularies().length / this.pageSize);
+  });
+
+  hasNextPage = computed(() => this.currentPage() < this.totalPages() - 1);
+  hasPrevPage = computed(() => this.currentPage() > 0);
 
   save(): void {
     this.claudeService.saveApiKey(this.apiKey());
@@ -65,6 +96,7 @@ export class SettingsComponent {
   clearAllCache(): void {
     if (confirm('Wirklich alle Audio-Caches löschen? Die Audiodaten können jederzeit neu generiert werden.')) {
       this.ttsCacheService.clearAllCache();
+      this.currentPage.set(0);
       this.snackBar.open('Audio-Cache geleert', 'OK', { duration: 2000 });
     }
   }
@@ -72,5 +104,33 @@ export class SettingsComponent {
   clearVocabCache(vocabId: string): void {
     this.ttsCacheService.clearVocabularyCache(vocabId);
     this.snackBar.open('Cache gelöscht', 'OK', { duration: 1500 });
+
+    // Adjust page if current page is now empty
+    const maxPage = this.totalPages() - 1;
+    if (this.currentPage() > maxPage && maxPage >= 0) {
+      this.currentPage.set(maxPage);
+    }
+  }
+
+  onSearchChange(): void {
+    this.currentPage.set(0); // Reset to first page when searching
+  }
+
+  nextPage(): void {
+    if (this.hasNextPage()) {
+      this.currentPage.update(p => p + 1);
+    }
+  }
+
+  prevPage(): void {
+    if (this.hasPrevPage()) {
+      this.currentPage.update(p => p - 1);
+    }
+  }
+
+  goToPage(page: number): void {
+    if (page >= 0 && page < this.totalPages()) {
+      this.currentPage.set(page);
+    }
   }
 }
