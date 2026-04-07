@@ -1,4 +1,4 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { ITtsProvider } from './tts-provider.interface';
 import { PlappariTtsService } from './plappari-tts.service';
 import { BrowserTtsService } from './browser-tts.service';
@@ -15,8 +15,6 @@ export type TtsProviderType = 'plapperi' | 'browser';
 export class TtsManagerService {
   private plapperiService = inject(PlappariTtsService);
   private browserService = inject(BrowserTtsService);
-
-  readonly speaking = signal(false);
 
   /**
    * Get the current active TTS provider
@@ -52,7 +50,8 @@ export class TtsManagerService {
    * Speak text using the current provider
    */
   async speak(text: string): Promise<void> {
-    if (this.speaking()) {
+    // Check if either provider is currently speaking
+    if (this.plapperiService.isSpeaking() || this.browserService.isSpeaking()) {
       this.stop();
       return;
     }
@@ -60,15 +59,10 @@ export class TtsManagerService {
     const provider = this.getCurrentProvider();
 
     try {
-      this.speaking.set(true);
       await provider.speak(text);
     } catch (error) {
       console.error('TTS error:', error);
-      this.speaking.set(false);
       throw error;
-    } finally {
-      // Update speaking state based on provider
-      this.speaking.set(provider.isSpeaking());
     }
   }
 
@@ -76,9 +70,9 @@ export class TtsManagerService {
    * Stop current speech
    */
   stop(): void {
-    const provider = this.getCurrentProvider();
-    provider.stop();
-    this.speaking.set(false);
+    // Stop both providers to be safe
+    this.plapperiService.stop();
+    this.browserService.stop();
   }
 
   /**
@@ -112,9 +106,13 @@ export class TtsManagerService {
 
   /**
    * Check if currently speaking
+   * Returns true if any provider is currently speaking
    */
   isSpeaking(): boolean {
-    return this.speaking();
+    return this.plapperiService.isSpeaking() || this.browserService.isSpeaking();
   }
 }
+
+
+
 
