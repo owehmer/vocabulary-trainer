@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
+import { ITranslationProvider } from './translation-provider.interface';
 
 const API_KEY_STORAGE = 'vokabel_api_key';
 const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
@@ -11,7 +12,7 @@ export interface ExampleSentence {
 }
 
 @Injectable({ providedIn: 'root' })
-export class ClaudeService {
+export class ClaudeService implements ITranslationProvider {
   getApiKey(): string {
     return environment.claudeApiKey || localStorage.getItem(API_KEY_STORAGE) || '';
   }
@@ -23,6 +24,20 @@ export class ClaudeService {
   hasApiKey(): boolean {
     return this.getApiKey().length > 0;
   }
+
+  // ITranslationProvider implementation
+  isAvailable(): boolean {
+    return this.hasApiKey();
+  }
+
+  getName(): string {
+    return 'Claude AI';
+  }
+
+  async translateToSwissGerman(german: string): Promise<string> {
+    return this.generateSwissGerman(german);
+  }
+  // End ITranslationProvider implementation
 
   private async callClaude(prompt: string): Promise<string> {
     const apiKey = this.getApiKey();

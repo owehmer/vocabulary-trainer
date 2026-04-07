@@ -2,9 +2,44 @@
   <mat-card>
     <mat-card-header>
       <mat-card-title>Einstellungen</mat-card-title>
-      <mat-card-subtitle>Claude API-Key für die KI-Funktionen</mat-card-subtitle>
+      <mat-card-subtitle>Übersetzungs-Service und API-Konfiguration</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
+      <!-- Translation Provider Selection -->
+      <h3 class="section-title">Übersetzungs-Service</h3>
+      <p class="info-text">
+        <mat-icon class="info-icon">info</mat-icon>
+        Wähle den Service für die automatische Übersetzung ins Zürichdeutsche.
+      </p>
+
+      <mat-radio-group [(ngModel)]="selectedProvider" class="provider-radio-group">
+        <mat-radio-button value="plapperi" class="provider-option">
+          <div class="provider-info">
+            <strong>Plapperi API (kostenlos)</strong>
+            <span class="provider-desc">Spezialisiert auf Schweizer Dialekte, immer verfügbar</span>
+          </div>
+        </mat-radio-button>
+
+        <mat-radio-button
+          value="claude"
+          [disabled]="!claudeService.hasApiKey()"
+          class="provider-option"
+        >
+          <div class="provider-info">
+            <strong>Claude AI</strong>
+            <span class="provider-desc">
+              @if (claudeService.hasApiKey()) {
+                Erweiterte KI-Funktionen verfügbar
+              } @else {
+                Benötigt API-Key (siehe unten)
+              }
+            </span>
+          </div>
+        </mat-radio-button>
+      </mat-radio-group>
+
+      <!-- Claude API Key Section -->
+      <h3 class="section-title">Claude API-Key</h3>
       <p class="info-text">
         <mat-icon class="info-icon">info</mat-icon>
         Dein API-Key wird nur lokal in deinem Browser gespeichert und niemals an Dritte übermittelt.
@@ -14,7 +49,7 @@
       @if (!claudeService.hasApiKey()) {
         <div class="warning-box">
           <mat-icon>warning</mat-icon>
-          Kein API-Key hinterlegt — die KI-Funktionen (Auto-Vervollständigung, Beispielsätze) sind deaktiviert.
+          Kein API-Key hinterlegt — Claude AI und KI-Funktionen (Beispielsätze) sind deaktiviert.
         </div>
       }
 

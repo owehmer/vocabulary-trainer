@@ -10,7 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { VocabularyService } from '../../services/vocabulary.service';
-import { ClaudeService } from '../../services/claude.service';
+import { TranslationManagerService } from '../../services/translation-manager.service';
 import { SpeechService } from '../../services/speech.service';
 
 @Component({
@@ -34,7 +34,7 @@ export class VocabularyFormComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private vocabService = inject(VocabularyService);
-  claudeService = inject(ClaudeService);
+  translationManager = inject(TranslationManagerService);
   speechService = inject(SpeechService);
   private snackBar = inject(MatSnackBar);
 
@@ -61,15 +61,21 @@ export class VocabularyFormComponent implements OnInit {
     }
   }
 
-  async generate(): Promise<void> {
+  async translate(): Promise<void> {
     const g = this.german().trim();
     if (!g) {
       this.snackBar.open('Bitte zuerst das deutsche Wort eingeben', 'OK', { duration: 3000 });
       return;
     }
+
+    if (!this.translationManager.isAvailable()) {
+      this.snackBar.open('Kein Übersetzungs-Service verfügbar', 'OK', { duration: 3000 });
+      return;
+    }
+
     this.generating.set(true);
     try {
-      const result = await this.claudeService.generateSwissGerman(g);
+      const result = await this.translationManager.translate(g);
       this.swissGerman.set(result);
     } catch (err: any) {
       this.snackBar.open(err.message, 'OK', { duration: 5000 });
