@@ -12,7 +12,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { VocabularyService } from '../../services/vocabulary.service';
 import { ClaudeTranslationService, ExampleSentence } from '../../services/translation/claude-translation.service';
-import { TtsManagerService } from '../../services/tts-manager.service';
+import { TtsManagerService } from '../../services/tts/tts-manager.service';
 import { Vocabulary } from '../../models/vocabulary.model';
 import { TrainingMode } from '../training-config/training-config.component';
 

@@ -7,7 +7,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { VocabularyService } from '../../services/vocabulary.service';
-import { TtsManagerService } from '../../services/tts-manager.service';
+import { TtsManagerService } from '../../services/tts/tts-manager.service';
 import { Vocabulary } from '../../models/vocabulary.model';
 
 @Component({

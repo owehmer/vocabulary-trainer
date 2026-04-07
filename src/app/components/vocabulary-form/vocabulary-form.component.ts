@@ -11,7 +11,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { VocabularyService } from '../../services/vocabulary.service';
 import { TranslationManagerService } from '../../services/translation/translation-manager.service';
-import { TtsManagerService } from '../../services/tts-manager.service';
+import { TtsManagerService } from '../../services/tts/tts-manager.service';
 
 @Component({
   selector: 'app-vocabulary-form',
