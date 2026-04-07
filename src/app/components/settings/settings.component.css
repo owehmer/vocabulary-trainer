@@ -79,3 +79,109 @@
   font-size: 13px;
   color: #666;
 }
+
+.cache-stats {
+  display: flex;
+  gap: 24px;
+  margin: 16px 0;
+  padding: 16px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.stat-item {
+  font-size: 14px;
+  color: #555;
+}
+
+.cached-vocab-section {
+  margin-top: 16px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.section-header h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+}
+
+.cached-vocab-list {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 0 !important;
+}
+
+.vocab-cache-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 8px 16px;
+  gap: 16px;
+}
+
+.vocab-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.vocab-german {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vocab-swiss {
+  font-size: 13px;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cache-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.cache-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  background: #e3f2fd;
+  border-radius: 12px;
+  font-size: 12px;
+  color: #1976d2;
+}
+
+.cache-badge mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.empty-cache-text {
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+  margin: 24px 0;
+  font-style: italic;
+}
+

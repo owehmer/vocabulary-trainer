@@ -62,7 +62,7 @@
               <div class="card-side revealed">
                 <div class="card-label">Zürichdeutsch</div>
                 <div class="card-word">{{ current().swissGerman }}</div>
-                <button mat-icon-button class="speak-inline" (click)="$event.stopPropagation(); ttsManager.speak(current().swissGerman)" [matTooltip]="'Aussprechen mit ' + ttsManager.getCurrentProviderName()">
+                <button mat-icon-button class="speak-inline" (click)="speakSwissGerman($event)" matTooltip="Aussprechen">
                   <mat-icon>{{ ttsManager.isSpeaking() ? 'stop' : 'volume_up' }}</mat-icon>
                 </button>
               </div>
@@ -113,7 +113,7 @@
                 <mat-icon>cancel</mat-icon>
                 Falsch! Richtige Antwort: <strong>{{ current().swissGerman }}</strong>
               }
-              <button mat-icon-button class="speak-inline" (click)="ttsManager.speak(current().swissGerman)" [matTooltip]="'Aussprechen mit ' + ttsManager.getCurrentProviderName()">
+              <button mat-icon-button class="speak-inline" (click)="speakSwissGerman($event)" matTooltip="Aussprechen">
                 <mat-icon>{{ ttsManager.isSpeaking() ? 'stop' : 'volume_up' }}</mat-icon>
               </button>
             </div>
@@ -191,7 +191,7 @@
             <div class="example-swiss">
               <mat-icon class="quote-icon">format_quote</mat-icon>
               {{ exampleSentence()!.swiss }}
-              <button mat-icon-button class="speak-inline" (click)="ttsManager.speak(exampleSentence()!.swiss)" [matTooltip]="'Aussprechen mit ' + ttsManager.getCurrentProviderName()">
+              <button mat-icon-button class="speak-inline" (click)="speakExampleSentence($event)" [matTooltip]="'Aussprechen mit ' + ttsManager.getCurrentProviderName()">
                 <mat-icon>{{ ttsManager.isSpeaking() ? 'stop' : 'volume_up' }}</mat-icon>
               </button>
             </div>

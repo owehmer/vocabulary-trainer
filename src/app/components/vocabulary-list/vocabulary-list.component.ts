@@ -65,4 +65,11 @@ export class VocabularyListComponent {
         input.value = '';
       });
   }
+
+  /**
+   * Speak Swiss German word with caching support
+   */
+  speakSwissGerman(vocab: Vocabulary): void {
+    this.ttsManager.speakWithCache(vocab.swissGerman, vocab.id, 'swiss');
+  }
 }

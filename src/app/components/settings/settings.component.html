@@ -65,6 +65,64 @@
           <mat-icon>{{ hideKey() ? 'visibility' : 'visibility_off' }}</mat-icon>
         </button>
       </mat-form-field>
+
+      <!-- Audio Cache Section -->
+      <h3 class="section-title">Audio Cache</h3>
+      <p class="info-text">
+        <mat-icon class="info-icon">info</mat-icon>
+        Audio-Dateien werden lokal gespeichert, um API-Aufrufe zu vermeiden. Der Cache wird automatisch bei jedem Abspielen aktualisiert.
+      </p>
+
+      <div class="cache-stats">
+        <div class="stat-item">
+          <strong>{{ cacheStats().cached }}</strong> von <strong>{{ cacheStats().total }}</strong> Vokabeln gecacht
+        </div>
+        <div class="stat-item">
+          <strong>{{ cacheStats().cacheSize }} KB</strong> Speicher verwendet
+        </div>
+      </div>
+
+      @if (cachedVocabularies().length > 0) {
+        <div class="cached-vocab-section">
+          <div class="section-header">
+            <h4>Gecachte Vokabeln</h4>
+            <button mat-stroked-button color="warn" (click)="clearAllCache()">
+              <mat-icon>delete_sweep</mat-icon>
+              Alle löschen
+            </button>
+          </div>
+
+          <mat-list class="cached-vocab-list">
+            @for (vocab of cachedVocabularies(); track vocab.id) {
+              <mat-list-item>
+                <div class="vocab-cache-item">
+                  <div class="vocab-text">
+                    <span class="vocab-german">{{ vocab.german }}</span>
+                    <span class="vocab-swiss">{{ vocab.swissGerman }}</span>
+                  </div>
+                  <div class="cache-badges">
+                    @if (vocab.audioCache?.swissGermanAudio) {
+                      <span class="cache-badge" matTooltip="Wort gecacht">
+                        <mat-icon>volume_up</mat-icon>
+                      </span>
+                    }
+                    @if (vocab.audioCache?.exampleSentenceAudio) {
+                      <span class="cache-badge" matTooltip="Beispielsatz gecacht">
+                        <mat-icon>format_quote</mat-icon>
+                      </span>
+                    }
+                    <button mat-icon-button (click)="clearVocabCache(vocab.id)" matTooltip="Cache löschen">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </mat-list-item>
+            }
+          </mat-list>
+        </div>
+      } @else {
+        <p class="empty-cache-text">Noch keine Audiodaten gecacht. Spiele Vokabeln ab, um sie zu cachen.</p>
+      }
     </mat-card-content>
     <mat-card-actions align="end">
       <button mat-flat-button color="primary" (click)="save()">

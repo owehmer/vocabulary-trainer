@@ -98,4 +98,20 @@ export class VocabularyFormComponent implements OnInit {
     }
     this.router.navigate(['/']);
   }
+
+  /**
+   * Speak Swiss German word with caching support (for edit mode)
+   */
+  speakSwissGerman(): void {
+    const text = this.swissGerman().trim();
+    if (!text) return;
+
+    // Use cache if editing existing entry
+    if (this.isEdit && this.editId()) {
+      this.ttsManager.speakWithCache(text, this.editId()!, 'swiss');
+    } else {
+      // No cache for new entries (not yet saved)
+      this.ttsManager.speak(text);
+    }
+  }
 }

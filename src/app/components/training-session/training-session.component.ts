@@ -211,4 +211,31 @@ export class TrainingSessionComponent implements OnInit {
       return '';
     };
   }
+
+  /**
+   * Speak Swiss German word with caching support
+   */
+  speakSwissGerman(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    const current = this.current();
+    if (current) {
+      this.ttsManager.speakWithCache(current.swissGerman, current.id, 'swiss');
+    }
+  }
+
+  /**
+   * Speak example sentence with caching support
+   */
+  speakExampleSentence(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    const current = this.current();
+    const example = this.exampleSentence();
+    if (current && example) {
+      this.ttsManager.speakWithCache(example.swiss, current.id, 'example');
+    }
+  }
 }

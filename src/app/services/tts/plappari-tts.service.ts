@@ -23,7 +23,24 @@ export class PlappariTtsService implements ITtsProvider {
 
   constructor(private http: HttpClient) {}
 
-  async speak(text: string, voiceId = 'aragon'): Promise<void> {
+  /**
+   * Speak text and return the audio data URL for caching
+   */
+  async speakAndCache(text: string, voiceId = 'aragon'): Promise<string> {
+    const response = await firstValueFrom(
+      this.http.post<PlappariResponse>(this.apiUrl, {
+        text_ch: text,
+        voice_id: voiceId
+      })
+    );
+
+    return `data:audio/${response.format};base64,${response.audio}`;
+  }
+
+  /**
+   * Play audio from a data URL (cached or fresh)
+   */
+  async playAudioData(audioData: string): Promise<void> {
     if (this.speaking()) {
       this.stop();
       return;
@@ -31,18 +48,7 @@ export class PlappariTtsService implements ITtsProvider {
 
     try {
       this.speaking.set(true);
-
-      const response = await firstValueFrom(
-        this.http.post<PlappariResponse>(this.apiUrl, {
-          text_ch: text,
-          voice_id: voiceId
-        })
-      );
-
-      // Decode base64 audio and play
-      const audioData = `data:audio/${response.format};base64,${response.audio}`;
       const audio = new Audio(audioData);
-
       this.currentAudio = audio;
 
       audio.onended = () => {
@@ -53,10 +59,22 @@ export class PlappariTtsService implements ITtsProvider {
       audio.onerror = () => {
         this.speaking.set(false);
         this.currentAudio = null;
-        console.error('Error playing Plapperi audio');
+        console.error('Error playing audio');
       };
 
       await audio.play();
+    } catch (error) {
+      this.speaking.set(false);
+      this.currentAudio = null;
+      console.error('Error playing audio:', error);
+      throw error;
+    }
+  }
+
+  async speak(text: string, voiceId = 'aragon'): Promise<void> {
+    try {
+      const audioData = await this.speakAndCache(text, voiceId);
+      await this.playAudioData(audioData);
     } catch (error) {
       this.speaking.set(false);
       this.currentAudio = null;

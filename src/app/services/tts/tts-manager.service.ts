@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { ITtsProvider } from './tts-provider.interface';
 import { PlappariTtsService } from './plappari-tts.service';
 import { BrowserTtsService } from './browser-tts.service';
+import { TtsCacheService } from './tts-cache.service';
 
 const PROVIDER_STORAGE = 'vokabel_tts_provider';
 
@@ -9,12 +10,13 @@ export type TtsProviderType = 'plapperi' | 'browser';
 
 /**
  * Manager service that provides a unified interface for Text-to-Speech
- * Handles switching between different TTS providers
+ * Handles switching between different TTS providers and audio caching
  */
 @Injectable({ providedIn: 'root' })
 export class TtsManagerService {
   private plapperiService = inject(PlappariTtsService);
   private browserService = inject(BrowserTtsService);
+  private cacheService = inject(TtsCacheService);
 
   /**
    * Get the current active TTS provider
@@ -60,6 +62,58 @@ export class TtsManagerService {
 
     try {
       await provider.speak(text);
+    } catch (error) {
+      console.error('TTS error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Speak with caching support for vocabulary
+   * @param text Text to speak
+   * @param vocabularyId ID of the vocabulary entry
+   * @param cacheType Type of cache (swiss or example)
+   */
+  async speakWithCache(
+    text: string,
+    vocabularyId?: string,
+    cacheType: 'swiss' | 'example' = 'swiss'
+  ): Promise<void> {
+    // Check if either provider is currently speaking
+    if (this.plapperiService.isSpeaking() || this.browserService.isSpeaking()) {
+      this.stop();
+      return;
+    }
+
+    // Only use cache with Plapperi provider (browser TTS doesn't need caching)
+    const preferredType = this.getPreferredProviderType();
+    if (preferredType !== 'plapperi' || !vocabularyId) {
+      return this.speak(text);
+    }
+
+    try {
+      // Check cache first
+      const cachedAudio = cacheType === 'swiss'
+        ? this.cacheService.getCachedSwissAudio(vocabularyId)
+        : this.cacheService.getCachedExampleAudio(vocabularyId);
+
+      if (cachedAudio) {
+        // Play from cache
+        await this.plapperiService.playAudioData(cachedAudio);
+      } else {
+        // Generate and cache
+        const audioData = await this.plapperiService.speakAndCache(text);
+
+        // Cache the audio
+        if (cacheType === 'swiss') {
+          this.cacheService.cacheSwissAudio(vocabularyId, audioData);
+        } else {
+          this.cacheService.cacheExampleAudio(vocabularyId, audioData);
+        }
+
+        // Play the audio
+        await this.plapperiService.playAudioData(audioData);
+      }
     } catch (error) {
       console.error('TTS error:', error);
       throw error;
