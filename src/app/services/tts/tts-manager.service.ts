@@ -70,15 +70,10 @@ export class TtsManagerService {
 
   /**
    * Speak with caching support for vocabulary
+   * Cache is based on text content, not vocabulary ID
    * @param text Text to speak
-   * @param vocabularyId ID of the vocabulary entry (optional, for backward compatibility)
-   * @param cacheType Type of cache (swiss or example) - not used anymore, kept for compatibility
    */
-  async speakWithCache(
-    text: string,
-    vocabularyId?: string,
-    cacheType: 'swiss' | 'example' = 'swiss'
-  ): Promise<void> {
+  async speakWithCache(text: string): Promise<void> {
     // Check if either provider is currently speaking
     if (this.plapperiService.isSpeaking() || this.browserService.isSpeaking()) {
       this.stop();

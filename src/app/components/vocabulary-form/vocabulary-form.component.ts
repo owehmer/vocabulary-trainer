@@ -181,18 +181,14 @@ export class VocabularyFormComponent implements OnInit {
   }
 
   /**
-   * Speak Swiss German word with caching support (for edit mode)
+   * Speak Swiss German word with caching support
+   * Cache is based on text, not vocabulary ID, so it works for both new and existing entries
    */
   speakSwissGerman(): void {
     const text = this.swissGerman().trim();
     if (!text) return;
 
-    // Use cache if editing existing entry
-    if (this.isEdit && this.editId()) {
-      this.ttsManager.speakWithCache(text, this.editId()!, 'swiss');
-    } else {
-      // No cache for new entries (not yet saved)
-      this.ttsManager.speak(text);
-    }
+    // Always use cache - it's based on text content, not vocabulary ID
+    this.ttsManager.speakWithCache(text);
   }
 }

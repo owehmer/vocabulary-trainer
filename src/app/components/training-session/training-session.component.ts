@@ -221,7 +221,7 @@ export class TrainingSessionComponent implements OnInit {
     }
     const current = this.current();
     if (current) {
-      this.ttsManager.speakWithCache(current.swissGerman, current.sourceVocabId, 'swiss');
+      this.ttsManager.speakWithCache(current.swissGerman);
     }
   }
 
@@ -232,10 +232,9 @@ export class TrainingSessionComponent implements OnInit {
     if (event) {
       event.stopPropagation();
     }
-    const current = this.current();
     const example = this.exampleSentence();
-    if (current && example) {
-      this.ttsManager.speakWithCache(example.swiss, current.sourceVocabId, 'example');
+    if (example) {
+      this.ttsManager.speakWithCache(example.swiss);
     }
   }
 }

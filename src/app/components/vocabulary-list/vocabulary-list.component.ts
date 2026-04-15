@@ -70,6 +70,6 @@ export class VocabularyListComponent {
    * Speak Swiss German word with caching support
    */
   speakSwissGerman(vocab: Vocabulary): void {
-    this.ttsManager.speakWithCache(vocab.swissGerman, vocab.id, 'swiss');
+    this.ttsManager.speakWithCache(vocab.swissGerman);
   }
 }
