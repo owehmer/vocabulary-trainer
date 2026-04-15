@@ -38,6 +38,29 @@
         </mat-radio-button>
       </mat-radio-group>
 
+      <!-- TTS Provider Selection -->
+      <h3 class="section-title">Text-to-Speech Service</h3>
+      <p class="info-text">
+        <mat-icon class="info-icon">info</mat-icon>
+        Wähle den Service für die Sprachausgabe der Vokabeln.
+      </p>
+
+      <mat-radio-group [(ngModel)]="selectedTtsProvider" class="provider-radio-group">
+        <mat-radio-button value="plapperi" class="provider-option">
+          <div class="provider-info">
+            <strong>Plapperi API (kostenlos)</strong>
+            <span class="provider-desc">Natürliche Schweizer Dialekt-Aussprache, unterstützt Caching</span>
+          </div>
+        </mat-radio-button>
+
+        <mat-radio-button value="browser" class="provider-option">
+          <div class="provider-info">
+            <strong>Browser TTS</strong>
+            <span class="provider-desc">Native Browser-Sprachsynthese, offline verfügbar</span>
+          </div>
+        </mat-radio-button>
+      </mat-radio-group>
+
       <!-- Claude API Key Section -->
       <h3 class="section-title">Claude API-Key</h3>
       <p class="info-text">

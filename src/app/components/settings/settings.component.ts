@@ -13,6 +13,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ClaudeTranslationService } from '../../services/translation/claude-translation.service';
 import { TranslationManagerService, ProviderType } from '../../services/translation/translation-manager.service';
 import { AudioCacheStorageService } from '../../services/tts/audio-cache-storage.service';
+import { TtsManagerService, TtsProviderType } from '../../services/tts/tts-manager.service';
 import { VocabularyService } from '../../services/vocabulary.service';
 import {MatTooltip} from '@angular/material/tooltip';
 
@@ -38,12 +39,14 @@ export class SettingsComponent {
   protected claudeService = inject(ClaudeTranslationService);
   protected translationManager = inject(TranslationManagerService);
   protected audioCacheStorage = inject(AudioCacheStorageService);
+  protected ttsManager = inject(TtsManagerService);
   protected vocabService = inject(VocabularyService);
   private snackBar = inject(MatSnackBar);
 
   apiKey = signal(this.claudeService.getApiKey());
   hideKey = signal(true);
   selectedProvider = signal<ProviderType>(this.translationManager.getPreferredProviderType());
+  selectedTtsProvider = signal<TtsProviderType>(this.ttsManager.getPreferredProviderType());
 
   // Cache management
   cacheSearchQuery = signal('');
@@ -83,6 +86,7 @@ export class SettingsComponent {
   save(): void {
     this.claudeService.saveApiKey(this.apiKey());
     this.translationManager.setPreferredProviderType(this.selectedProvider());
+    this.ttsManager.setPreferredProviderType(this.selectedTtsProvider());
     this.snackBar.open('Einstellungen gespeichert', 'OK', { duration: 2000 });
   }
 

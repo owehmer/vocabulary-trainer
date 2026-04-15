@@ -21,7 +21,7 @@ export class TtsManagerService {
   /**
    * Get the current active TTS provider
    */
-  getCurrentProvider(): ITtsProvider {
+  private getCurrentProvider(): ITtsProvider {
     const preferredType = this.getPreferredProviderType();
 
     // Try to use preferred provider if available
@@ -51,7 +51,7 @@ export class TtsManagerService {
   /**
    * Speak text using the current provider
    */
-  async speak(text: string): Promise<void> {
+  private async speak(text: string): Promise<void> {
     // Check if either provider is currently speaking
     if (this.plapperiService.isSpeaking() || this.browserService.isSpeaking()) {
       this.stop();
