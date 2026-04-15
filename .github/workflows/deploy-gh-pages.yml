@@ -35,7 +35,7 @@ jobs:
         run: npm ci
 
       - name: Build Angular app for production
-        run: npm run build -- --base-href /vokabel/
+        run: npm run build
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
