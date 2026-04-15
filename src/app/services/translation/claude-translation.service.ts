@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../environments/environment.prd';
 import { ITranslationProvider } from './translation-provider.interface';
 
 const API_KEY_STORAGE = 'vokabel_api_key';
