@@ -52,4 +52,18 @@ main {
   .nav-label {
     display: none;
   }
+
+  .nav-links {
+    gap: 0;
+  }
+
+  .nav-links a {
+    min-width: 48px;
+    min-height: 48px;
+    justify-content: center;
+  }
+
+  main {
+    padding-bottom: 24px;
+  }
 }

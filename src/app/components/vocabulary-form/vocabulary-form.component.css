@@ -117,3 +117,21 @@
   }
 }
 
+@media (max-width: 480px) {
+  .page-container {
+    margin: 12px auto;
+  }
+
+  .swiss-row {
+    flex-wrap: wrap;
+  }
+
+  .swiss-field {
+    flex: 1 1 100%;
+  }
+
+  .translate-btn {
+    flex: 1;
+  }
+}
+
